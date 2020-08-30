@@ -1,4 +1,4 @@
-package com.gmail.harsh_chuck.app.fragments
+package com.gmail.harsh_chuck.app.fragments.main
 
 import android.os.Bundle
 import android.os.Environment
@@ -7,11 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.gmail.harsh_chuck.R
 import com.gmail.harsh_chuck.app.activities.FileUtil
 import com.gmail.harsh_chuck.network.NetworkService
 import com.jakewharton.rxbinding.view.clicks
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.main_fragment.*
 import timber.log.Timber
@@ -43,7 +45,14 @@ class MainFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         new_random.clicks()
             .subscribe({
-                makeRequest(networkService)
+                makeRandomJokesRequest(networkService)
+                makeJokesCategoriesRequest(networkService)
+            }) {
+                errorLog(it)
+            }
+        btn_settings.clicks()
+            .subscribe({
+                findNavController().navigate(R.id.settingsFragment)
             }) {
                 errorLog(it)
             }
@@ -53,7 +62,7 @@ class MainFragment : Fragment() {
         Timber.e(it)
     }
 
-    private fun makeRequest(networkService: NetworkService) {
+    private fun makeRandomJokesRequest(networkService: NetworkService) {
         networkService.getChuckApi().jokesRandom()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -62,6 +71,29 @@ class MainFragment : Fragment() {
                 jokeResponse?.value?.let { textValue ->
                     tv_joke.text = textValue
                 }
+            }) {
+                Timber.e(it)
+            }
+    }
+
+    private fun makeJokesCategoriesRequest(networkService: NetworkService) {
+        networkService.getChuckApi().jokesCategories()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .map {
+                it?.replace("[", "")
+
+            }.map {
+                it?.replace("]", "")
+            }
+            .map {
+                it?.split(",") ?: ArrayList()
+            }
+            .flatMapObservable {
+                Observable.fromIterable(it)
+            }
+            .subscribe({ response ->
+                Timber.d("$response")
             }) {
                 Timber.e(it)
             }

@@ -1,4 +1,4 @@
-package com.gmail.harsh_chuck.app.fragments
+package com.gmail.harsh_chuck.app.fragments.main
 
 import androidx.lifecycle.ViewModel
 

@@ -1,4 +1,4 @@
-package com.gmail.harsh_chuck.data.chuckApi
+package com.gmail.harsh_chuck.data.chuckApi.response
 
 
 import com.google.gson.annotations.Expose
