@@ -2,10 +2,11 @@ package com.gmail.harsh_chuck.domain
 
 import android.app.Application
 import com.gmail.harsh_chuck.BuildConfig
-import com.gmail.harsh_chuck.network.NetworkService
 import timber.log.Timber
 
+
 class AppController : Application() {
+
 
     override fun onCreate() {
         super.onCreate()
