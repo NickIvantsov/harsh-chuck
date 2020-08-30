@@ -46,7 +46,6 @@ class MainFragment : Fragment() {
         new_random.clicks()
             .subscribe({
                 makeRandomJokesRequest(networkService)
-                makeJokesCategoriesRequest(networkService)
             }) {
                 errorLog(it)
             }
@@ -76,28 +75,6 @@ class MainFragment : Fragment() {
             }
     }
 
-    private fun makeJokesCategoriesRequest(networkService: NetworkService) {
-        networkService.getChuckApi().jokesCategories()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .map {
-                it?.replace("[", "")
-
-            }.map {
-                it?.replace("]", "")
-            }
-            .map {
-                it?.split(",") ?: ArrayList()
-            }
-            .flatMapObservable {
-                Observable.fromIterable(it)
-            }
-            .subscribe({ response ->
-                Timber.d("$response")
-            }) {
-                Timber.e(it)
-            }
-    }
 
     private fun makeDir(): Boolean {
         //getExternalStorageDirectory устарел начиная с 29 API
