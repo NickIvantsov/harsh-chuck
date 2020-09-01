@@ -7,7 +7,8 @@ import javax.inject.Inject
 
 class RequestManager @Inject constructor(
     val randomJoke: IRandomJokes,
-    val jokesCategories: IJokesCategories
+    val categoriesJokes: ICategoriesJokes,
+    val jokeByCategory: IJokeByCategory
 ) {
 
     fun makeRandomJokesRequest(networkService: INetworkService): Disposable =
@@ -18,9 +19,16 @@ class RequestManager @Inject constructor(
 
 
     fun makeJokesCategoriesRequest(networkService: INetworkService): Disposable {
-        return jokesCategories.makeJokesCategoriesRequest(networkService)
+        return categoriesJokes.makeJokesCategoriesRequest(networkService)
     }
 
     fun resultJokesCategoriesLiveData(): MutableLiveData<String> =
-        jokesCategories.resultRequestLiveData()
+        categoriesJokes.resultRequestLiveData()
+
+    fun makeJokeByCategoryRequest(networkService: INetworkService, category: String): Disposable {
+        return jokeByCategory.makeRandomJokeByCategoryRequest(networkService, category)
+    }
+
+    fun resultJokeByCategoryLiveData(): MutableLiveData<String> =
+        jokeByCategory.resultRequestLiveData()
 }

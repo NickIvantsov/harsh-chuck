@@ -5,14 +5,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.navigation.fragment.findNavController
 import com.gmail.harsh_chuck.R
 import com.gmail.harsh_chuck.app.adapters.RadioAdapter
+import com.gmail.harsh_chuck.app.navigator.AppNavigator
+import com.gmail.harsh_chuck.app.navigator.JokeNavigator
+import com.gmail.harsh_chuck.app.navigator.JokeScreens
+import com.gmail.harsh_chuck.app.navigator.Screens
 import com.gmail.harsh_chuck.network.INetworkService
+import com.jakewharton.rxbinding.view.clicks
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.rxjava3.core.Observable
+import kotlinx.android.synthetic.main.joke_by_categore_fragment.*
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -24,11 +27,10 @@ class JokeByCategoryFragment : Fragment() {
     }
 
     @Inject
-    lateinit var networkService: INetworkService
+    lateinit var navigator: AppNavigator
 
     @Inject
-    lateinit var adapter: RadioAdapter<String>
-    private val viewModel: JokeByCategoryViewModel by viewModels()
+    lateinit var jokeNavigator: JokeNavigator
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -37,42 +39,26 @@ class JokeByCategoryFragment : Fragment() {
         return inflater.inflate(R.layout.joke_by_categore_fragment, container, false)
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        makeJokesCategoriesRequest()
-        jokesCategoriesLiveData()
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        /* context?.let {
-             adapter = CategoriesJokesAdapter(it)
-         }*/
-        val recyclerView = view.findViewById<RecyclerView>(R.id.rv_categories)
-        context?.let {
-            recyclerView.adapter = adapter
-        }
-
-        recyclerView.layoutManager = LinearLayoutManager(context)
-
-
+        backPressed()
+        btn_ok.clicks()
+            .subscribe({
+                jokeNavigator.navigateTo(JokeScreens.JOKE)
+            }) {
+                errorLog(it)
+            }
     }
 
-    private fun makeJokesCategoriesRequest() {
-        viewModel.makeJokesCategoriesRequest(networkService)
+    private fun backPressed() {
+        btn_back.clicks()
+            .subscribe({
+                findNavController().popBackStack()
+            }) {
+                errorLog(it)
+            }
     }
 
-    private fun jokesCategoriesLiveData() {
-        viewModel.jokesCategoriesLiveData.observe(viewLifecycleOwner) { categories ->
-            Observable
-                .just(categories)
-                .subscribe({
-                    adapter.addItem(it)
-                }) {
-                    errorLog(it)
-                }
-        }
-    }
 
     private fun errorLog(throwable: Throwable) {
         Timber.e(throwable)

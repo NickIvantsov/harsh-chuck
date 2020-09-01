@@ -1,8 +1,10 @@
 package com.gmail.harsh_chuck.di
 
-import com.gmail.harsh_chuck.network.request.IJokesCategories
+import com.gmail.harsh_chuck.network.request.ICategoriesJokes
+import com.gmail.harsh_chuck.network.request.IJokeByCategory
 import com.gmail.harsh_chuck.network.request.IRandomJokes
 import com.gmail.harsh_chuck.network.request.requestImpl.JokesCategoriesRequestImpl
+import com.gmail.harsh_chuck.network.request.requestImpl.randomJokesImpl.RandomJokesByCategoryRequestImpl
 import com.gmail.harsh_chuck.network.request.requestImpl.randomJokesImpl.RandomJokesRequestImpl
 import dagger.Binds
 import dagger.Module
@@ -20,5 +22,9 @@ abstract class RandomJokesRequestModule {
 
     @ActivityScoped
     @Binds
-    abstract fun bindJokesCategoriesRequest(impl: JokesCategoriesRequestImpl): IJokesCategories
+    abstract fun bindJokesCategoriesRequest(impl: JokesCategoriesRequestImpl): ICategoriesJokes
+
+    @ActivityScoped
+    @Binds
+    abstract fun bindJokesByCategoryRequest(impl: RandomJokesByCategoryRequestImpl): IJokeByCategory
 }

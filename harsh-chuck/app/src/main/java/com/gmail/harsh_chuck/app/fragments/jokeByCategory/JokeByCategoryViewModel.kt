@@ -8,8 +8,5 @@ import io.reactivex.rxjava3.disposables.Disposable
 
 class JokeByCategoryViewModel @ViewModelInject constructor(val requestManager: RequestManager) :
     ViewModel() {
-    val jokesCategoriesLiveData = requestManager.resultJokesCategoriesLiveData()
-    fun makeJokesCategoriesRequest(networkService: INetworkService): Disposable {
-        return requestManager.makeJokesCategoriesRequest(networkService)
-    }
+
 }
