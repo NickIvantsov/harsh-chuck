@@ -38,6 +38,13 @@ class JokesCategoriesAdapter @Inject constructor(val context: Context) :
     }
 
     fun add(newElement: String) {
+        data.forEach {
+            when (it) {
+                newElement -> {
+                    return
+                }
+            }
+        }
         data.add(newElement)
         notifyItemInserted(data.size - 1)
     }

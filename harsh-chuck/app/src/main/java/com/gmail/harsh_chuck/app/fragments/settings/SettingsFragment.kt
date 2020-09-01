@@ -12,9 +12,7 @@ import com.gmail.harsh_chuck.R
 import com.gmail.harsh_chuck.app.adapters.JokesCategoriesAdapter
 import com.gmail.harsh_chuck.network.INetworkService
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.schedulers.Schedulers
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -42,43 +40,36 @@ class SettingsFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        // TODO: Use the ViewModel
+        makeJokesCategoriesRequest()
+        jokesCategoriesLiveData()
+    }
+
+    private fun makeJokesCategoriesRequest() {
+        viewModel.makeJokesCategoriesRequest(networkService)
+    }
+
+    private fun jokesCategoriesLiveData() {
+        viewModel.jokesCategoriesLiveData.observe(viewLifecycleOwner) { categories ->
+            Observable
+                .just(categories)
+                .subscribe({
+                    adapter.add(it)
+                }) {
+                    errorLog(it)
+                }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val recyclerView = view.findViewById<RecyclerView>(R.id.rv_jokes_categories)
-
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(context)
 
-        makeJokesCategoriesRequest(networkService)
+
     }
 
-    private fun makeJokesCategoriesRequest(networkService: INetworkService) {
-        networkService.getChuckApi().jokesCategories()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .map {
-                it?.replace("[", "")
-
-            }.map {
-                it?.replace("]", "")
-            }
-            .map {
-                it?.replace("\"", "")
-            }
-            .map {
-                it?.split(",") ?: ArrayList()
-            }
-            .flatMapObservable {
-                Observable.fromIterable(it)
-            }
-            .subscribe({ responseItem ->
-                adapter.add(responseItem)
-                Timber.d("$responseItem")
-            }) {
-                Timber.e(it)
-            }
+    private fun errorLog(throwable: Throwable) {
+        Timber.e(throwable)
     }
 }
