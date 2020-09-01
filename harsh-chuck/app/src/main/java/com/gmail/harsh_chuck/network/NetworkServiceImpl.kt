@@ -9,15 +9,18 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
+import javax.inject.Inject
 
 /**
  * класс предоставляющий единую точку входа для доступа к запросам.Список запросов перечислен в  [ApiChuck]
  */
-object NetworkService : INetworkService {
-    private const val BASE_CHUCK_URL =
-        "https://matchilling-chuck-norris-jokes-v1.p.rapidapi.com/"
-    private const val BASE_TEXT_TO_SPEECH_URL =
-        "https://voicerss-text-to-speech.p.rapidapi.com"
+class NetworkService @Inject constructor() : INetworkService {
+    companion object {
+        private const val BASE_CHUCK_URL =
+            "https://matchilling-chuck-norris-jokes-v1.p.rapidapi.com/"
+        private const val BASE_TEXT_TO_SPEECH_URL =
+            "https://voicerss-text-to-speech.p.rapidapi.com"
+    }
 
     private val interceptor = HttpLoggingInterceptor()
 

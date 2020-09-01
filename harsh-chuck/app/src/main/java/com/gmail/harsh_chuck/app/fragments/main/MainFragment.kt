@@ -1,23 +1,19 @@
 package com.gmail.harsh_chuck.app.fragments.main
 
 import android.os.Bundle
-import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
-import androidx.navigation.fragment.findNavController
+import androidx.fragment.app.viewModels
 import com.gmail.harsh_chuck.R
-import com.gmail.harsh_chuck.app.activities.FileUtil
-import com.gmail.harsh_chuck.network.NetworkService
+import com.gmail.harsh_chuck.app.navigator.AppNavigator
+import com.gmail.harsh_chuck.app.navigator.Screens
+import com.gmail.harsh_chuck.network.INetworkService
 import com.jakewharton.rxbinding.view.clicks
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.core.Observable
 import kotlinx.android.synthetic.main.main_fragment.*
-import timber.log.Timber
-import java.io.FileOutputStream
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -30,8 +26,13 @@ class MainFragment : Fragment() {
     @Inject
     lateinit var mainViewModelFactory: MainViewModelFactory
 
-    val networkService = NetworkService
-    private lateinit var viewModel: MainViewModel
+    @Inject
+    lateinit var networkService: INetworkService
+
+    @Inject
+    lateinit var navigator: AppNavigator
+
+    private val viewModel: MainViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,8 +43,11 @@ class MainFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this, mainViewModelFactory).get(MainViewModel::class.java)
 
+        jokeLiveData()
+    }
+
+    private fun jokeLiveData() {
         viewModel.jokeLiveData.observe(viewLifecycleOwner) { jokeText ->
             Observable.just(jokeText)
                 .subscribe({
@@ -54,6 +58,7 @@ class MainFragment : Fragment() {
         }
     }
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         newRandomPressed()
@@ -63,7 +68,7 @@ class MainFragment : Fragment() {
     private fun settingsPressed() {
         btn_settings.clicks()
             .subscribe({
-                findNavController().navigate(R.id.settingsFragment)
+                navigator.navigateTo(Screens.SETTINGS)
             }) {
                 errorLog(it)
             }
@@ -78,25 +83,11 @@ class MainFragment : Fragment() {
             }
     }
 
-    private fun errorLog(it: Throwable?) {
-        Timber.e(it)
-    }
-
-
     private fun setTvJokeText(textValue: String) {
         tv_joke.text = textValue
     }
 
-
-    private fun makeDir(): Boolean {
-        //getExternalStorageDirectory устарел начиная с 29 API
-        return FileUtil.createDir(Environment.getExternalStorageDirectory().path + "/mp3Files")//todo хардкод
-    }
-
-    private fun convertBytesToFile(bytearray: ByteArray) {
-        val fos =
-            FileOutputStream(Environment.getExternalStorageDirectory().path + "/hello-2.mp3", false)
-        fos.write(bytearray)
-        fos.close()
+    private fun errorLog(it: Throwable?) {
+        viewModel.errorLog(it)
     }
 }

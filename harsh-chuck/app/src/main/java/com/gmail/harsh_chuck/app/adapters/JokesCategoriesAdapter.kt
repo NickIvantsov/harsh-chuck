@@ -9,9 +9,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.gmail.harsh_chuck.R
+import javax.inject.Inject
 
 
-class JokesCategoriesAdapter(val context: Context) :
+class JokesCategoriesAdapter @Inject constructor(val context: Context) :
     RecyclerView.Adapter<JokesCategoriesAdapter.JokesCategoriesViewHolder>() {
     private val inflater: LayoutInflater = LayoutInflater.from(context)
     val data: MutableList<String> = ArrayList()
