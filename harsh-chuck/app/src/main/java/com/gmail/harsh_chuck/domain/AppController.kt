@@ -2,9 +2,10 @@ package com.gmail.harsh_chuck.domain
 
 import android.app.Application
 import com.gmail.harsh_chuck.BuildConfig
+import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 
-
+@HiltAndroidApp
 class AppController : Application() {
 
 

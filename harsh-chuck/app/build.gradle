@@ -4,6 +4,7 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: "org.jetbrains.dokka"
 apply plugin: 'androidx.navigation.safeargs.kotlin'
+apply plugin: 'dagger.hilt.android.plugin'
 
 dokka {
     outputFormat = 'javadoc' // use 'javadoc' to get standard java docs
@@ -77,9 +78,9 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
     //Dagger 2
-    def dagger_version = "2.27"
+   /* def dagger_version = "2.27"
     implementation "com.google.dagger:dagger:$dagger_version"
-    kapt "com.google.dagger:dagger-compiler:$dagger_version"
+    kapt "com.google.dagger:dagger-compiler:$dagger_version"*/
 
 
     def lifecycle_version = "2.2.0"
@@ -161,4 +162,8 @@ dependencies {
 
     //Cicerone
 //    implementation "ru.terrakok.cicerone:cicerone:5.1.1"
+
+    //DI Hilt
+    implementation "com.google.dagger:hilt-android:$hilt_version"
+    kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
 }

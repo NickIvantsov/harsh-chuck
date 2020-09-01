@@ -13,7 +13,7 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
 /**
  * класс предоставляющий единую точку входа для доступа к запросам.Список запросов перечислен в  [ApiChuck]
  */
-object NetworkService {
+object NetworkService : INetworkService {
     private const val BASE_CHUCK_URL =
         "https://matchilling-chuck-norris-jokes-v1.p.rapidapi.com/"
     private const val BASE_TEXT_TO_SPEECH_URL =
@@ -52,9 +52,9 @@ object NetworkService {
     /**
      * @return возвразает обьект [ApiChuck]
      */
-    fun getChuckApi(): ApiChuck = mRetrofitChuck.create(ApiChuck::class.java)
+    override fun getChuckApi(): ApiChuck = mRetrofitChuck.create(ApiChuck::class.java)
 
-    fun getTextToSpeechApi(): TextToSpeechApi =
+    override fun getTextToSpeechApi(): TextToSpeechApi =
         mRetrofitTextToSpeech.create(TextToSpeechApi::class.java)
 
     init {

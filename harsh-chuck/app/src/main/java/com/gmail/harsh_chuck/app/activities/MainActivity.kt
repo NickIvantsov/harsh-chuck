@@ -8,10 +8,11 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.gmail.harsh_chuck.R
+import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 import java.io.File
 
-
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
 
