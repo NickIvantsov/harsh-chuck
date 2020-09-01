@@ -14,6 +14,7 @@ class AppNavigatorImpl @Inject constructor(private val activity: FragmentActivit
         val fragment: Int = when (screen) {
             Screens.MAIN -> R.id.mainFragment
             Screens.SETTINGS -> R.id.settingsFragment
+            Screens.JOKE_BY_CATEGORY -> R.id.jokeByCategoryFragment
         }
         activity.findNavController(R.id.my_nav_host_fragment).navigate(fragment)
     }

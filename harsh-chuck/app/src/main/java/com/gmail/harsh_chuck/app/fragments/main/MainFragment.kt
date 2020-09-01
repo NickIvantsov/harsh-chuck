@@ -14,7 +14,6 @@ import com.jakewharton.rxbinding.view.clicks
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.core.Observable
 import kotlinx.android.synthetic.main.main_fragment.*
-import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -64,6 +63,16 @@ class MainFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         newRandomPressed()
         settingsPressed()
+        jokeByCategoryPressed()
+    }
+
+    private fun jokeByCategoryPressed() {
+        btn_joke_by_category.clicks()
+            .subscribe({
+                navigator.navigateTo(Screens.JOKE_BY_CATEGORY)
+            }) {
+                errorLog(it)
+            }
     }
 
     private fun settingsPressed() {

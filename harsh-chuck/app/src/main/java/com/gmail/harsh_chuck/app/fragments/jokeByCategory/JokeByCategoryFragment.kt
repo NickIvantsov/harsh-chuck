@@ -1,4 +1,4 @@
-package com.gmail.harsh_chuck.app.fragments.settings
+package com.gmail.harsh_chuck.app.fragments.jokeByCategory
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -17,10 +17,10 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SettingsFragment : Fragment() {
+class JokeByCategoryFragment : Fragment() {
 
     companion object {
-        fun newInstance() = SettingsFragment()
+        fun newInstance() = JokeByCategoryFragment()
     }
 
     @Inject
@@ -28,20 +28,34 @@ class SettingsFragment : Fragment() {
 
     @Inject
     lateinit var adapter: RadioAdapter<String>
-
-    private val viewModel: SettingsViewModel by viewModels()
+    private val viewModel: JokeByCategoryViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.settings_fragment, container, false)
+        return inflater.inflate(R.layout.joke_by_categore_fragment, container, false)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         makeJokesCategoriesRequest()
         jokesCategoriesLiveData()
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        /* context?.let {
+             adapter = CategoriesJokesAdapter(it)
+         }*/
+        val recyclerView = view.findViewById<RecyclerView>(R.id.rv_categories)
+        context?.let {
+            recyclerView.adapter = adapter
+        }
+
+        recyclerView.layoutManager = LinearLayoutManager(context)
+
+
     }
 
     private fun makeJokesCategoriesRequest() {
@@ -58,18 +72,6 @@ class SettingsFragment : Fragment() {
                     errorLog(it)
                 }
         }
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        val recyclerView = view.findViewById<RecyclerView>(R.id.rv_jokes_categories)
-        context?.let {
-            recyclerView.adapter = adapter
-        }
-
-        recyclerView.layoutManager = LinearLayoutManager(context)
-
-
     }
 
     private fun errorLog(throwable: Throwable) {
