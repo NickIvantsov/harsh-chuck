@@ -4,10 +4,16 @@ import android.app.Application
 import com.gmail.harsh_chuck.BuildConfig
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
+import javax.inject.Inject
 
 @HiltAndroidApp
 class AppController : Application() {
 
+    @Inject
+    lateinit var releaseTree: ReleaseTree
+
+    @Inject
+    lateinit var debugTree: Timber.DebugTree
 
     override fun onCreate() {
         super.onCreate()
@@ -19,10 +25,10 @@ class AppController : Application() {
     }
 
     private fun setTimberDebugTree() {
-        Timber.plant(Timber.DebugTree())
+        Timber.plant(debugTree)
     }
 
     private fun timberReleaseTreeInit() {
-        Timber.plant(ReleaseTree(this))
+        Timber.plant(releaseTree)
     }
 }
