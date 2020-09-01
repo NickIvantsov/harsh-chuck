@@ -3,7 +3,7 @@ package com.gmail.harsh_chuck.di
 import com.gmail.harsh_chuck.network.request.IJokesCategories
 import com.gmail.harsh_chuck.network.request.IRandomJokes
 import com.gmail.harsh_chuck.network.request.requestImpl.JokesCategoriesRequestImpl
-import com.gmail.harsh_chuck.network.request.requestImpl.RandomJokesRequestImpl
+import com.gmail.harsh_chuck.network.request.requestImpl.randomJokesImpl.RandomJokesRequestImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

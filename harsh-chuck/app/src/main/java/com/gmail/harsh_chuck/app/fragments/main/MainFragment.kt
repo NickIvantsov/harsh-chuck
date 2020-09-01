@@ -14,6 +14,7 @@ import com.jakewharton.rxbinding.view.clicks
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.core.Observable
 import kotlinx.android.synthetic.main.main_fragment.*
+import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint

@@ -1,4 +1,4 @@
-package com.gmail.harsh_chuck.network.request.requestImpl
+package com.gmail.harsh_chuck.network.request.requestImpl.randomJokesImpl
 
 import androidx.lifecycle.MutableLiveData
 import com.gmail.harsh_chuck.network.INetworkService
@@ -23,7 +23,7 @@ class RandomJokesRequestImpl @Inject constructor() : IRandomJokes {
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ jokeResponse ->
-                Timber.d(jokeResponse.toString())
+                Timber.d(jokeResponse.toString() )
                 jokeResponse?.value?.let { textValue ->
                     jokeLiveData.value = textValue
                 }

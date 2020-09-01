@@ -9,7 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.gmail.harsh_chuck.R
-import com.gmail.harsh_chuck.app.adapters.JokesCategoriesAdapter
+import com.gmail.harsh_chuck.app.adapters.CategoriesJokesAdapter
 import com.gmail.harsh_chuck.network.INetworkService
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.core.Observable
@@ -26,8 +26,11 @@ class SettingsFragment : Fragment() {
     @Inject
     lateinit var networkService: INetworkService
 
+    /*
+        @Inject
+        lateinit var adapter: JokesCategoriesAdapter*/
     @Inject
-    lateinit var adapter: JokesCategoriesAdapter
+    lateinit var adapter: CategoriesJokesAdapter
 
     private val viewModel: SettingsViewModel by viewModels()
 
@@ -53,7 +56,7 @@ class SettingsFragment : Fragment() {
             Observable
                 .just(categories)
                 .subscribe({
-                    adapter.add(it)
+                    adapter.addItem(it)
                 }) {
                     errorLog(it)
                 }
@@ -62,8 +65,14 @@ class SettingsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+       /* context?.let {
+            adapter = CategoriesJokesAdapter(it)
+        }*/
         val recyclerView = view.findViewById<RecyclerView>(R.id.rv_jokes_categories)
-        recyclerView.adapter = adapter
+        context?.let {
+            recyclerView.adapter = adapter
+        }
+
         recyclerView.layoutManager = LinearLayoutManager(context)
 
 

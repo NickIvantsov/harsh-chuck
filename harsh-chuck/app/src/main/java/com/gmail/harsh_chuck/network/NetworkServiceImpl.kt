@@ -3,6 +3,7 @@ package com.gmail.harsh_chuck.network
 import com.gmail.harsh_chuck.helpers.debugProductionManager.DebugProductionManager
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import com.itkacher.okhttpprofiler.OkHttpProfilerInterceptor
 import hu.akarnokd.rxjava3.retrofit.RxJava3CallAdapterFactory
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
