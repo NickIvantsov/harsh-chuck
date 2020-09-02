@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.gmail.harsh_chuck.R
 import com.gmail.harsh_chuck.app.adapters.RadioAdapter.Companion.selectedCategoriesJokes
+import com.gmail.harsh_chuck.domain.AppController
 import com.gmail.harsh_chuck.network.INetworkService
 import com.jakewharton.rxbinding.view.clicks
 import dagger.hilt.android.AndroidEntryPoint
@@ -60,6 +61,7 @@ class JokeFragment : Fragment() {
         newJokePressed()
         btn_category.clicks()
             .subscribe({
+                ((context?.applicationContext) as AppController).jokeCategoryLiveData.value = false
                 findNavController().popBackStack()
             }) {
                 errorLog(it)

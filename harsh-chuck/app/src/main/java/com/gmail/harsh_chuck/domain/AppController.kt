@@ -1,6 +1,7 @@
 package com.gmail.harsh_chuck.domain
 
 import android.app.Application
+import androidx.lifecycle.MutableLiveData
 import com.gmail.harsh_chuck.BuildConfig
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
@@ -8,6 +9,8 @@ import javax.inject.Inject
 
 @HiltAndroidApp
 class AppController : Application() {
+
+    val jokeCategoryLiveData = MutableLiveData<Boolean>()
 
     @Inject
     lateinit var releaseTree: ReleaseTree

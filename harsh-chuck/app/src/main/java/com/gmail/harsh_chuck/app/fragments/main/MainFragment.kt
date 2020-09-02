@@ -43,8 +43,8 @@ class MainFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-
         jokeLiveData()
+        newJokeRequest()
     }
 
     private fun jokeLiveData() {
@@ -87,10 +87,14 @@ class MainFragment : Fragment() {
     private fun newRandomPressed() {
         new_random.clicks()
             .subscribe({
-                viewModel.makeRandomJokesRequest(networkService)
+                newJokeRequest()
             }) {
                 errorLog(it)
             }
+    }
+
+    private fun newJokeRequest() {
+        viewModel.makeRandomJokesRequest(networkService)
     }
 
     private fun setTvJokeText(textValue: String) {
