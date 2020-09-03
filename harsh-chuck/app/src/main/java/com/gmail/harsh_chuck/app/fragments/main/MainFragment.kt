@@ -41,10 +41,14 @@ class MainFragment : Fragment() {
         return inflater.inflate(R.layout.main_fragment, container, false)
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        newJokeRequest()
+    }
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         jokeLiveData()
-        newJokeRequest()
     }
 
     private fun jokeLiveData() {
@@ -57,7 +61,6 @@ class MainFragment : Fragment() {
                 }
         }
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -104,4 +107,5 @@ class MainFragment : Fragment() {
     private fun errorLog(it: Throwable?) {
         viewModel.errorLog(it)
     }
+
 }

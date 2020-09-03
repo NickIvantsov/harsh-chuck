@@ -7,16 +7,10 @@ import android.view.ViewGroup
 import android.widget.RadioButton
 import androidx.recyclerview.widget.RecyclerView
 import com.gmail.harsh_chuck.R
+import com.gmail.harsh_chuck.domain.AppController
 
 abstract class RadioAdapter<T>(context: Context) :
     RecyclerView.Adapter<RadioAdapter<T>.ViewHolder>() {
-
-    companion object {
-        @Volatile
-        var selectedCategoriesJokes = ""
-            @Synchronized
-            private set
-    }
 
     var mSelectedItem = -1
     val mItems: ArrayList<T> = ArrayList()
@@ -43,7 +37,8 @@ abstract class RadioAdapter<T>(context: Context) :
         init {
             val clickListener: View.OnClickListener = View.OnClickListener {
                 mSelectedItem = adapterPosition
-                selectedCategoriesJokes = mItems[mSelectedItem] as String
+                (mContext.applicationContext as AppController).stringData.value =
+                    (mItems[mSelectedItem] as String)
                 notifyDataSetChanged()
             }
             itemView.setOnClickListener(clickListener)

@@ -11,6 +11,7 @@ import com.gmail.harsh_chuck.app.navigator.AppNavigator
 import com.gmail.harsh_chuck.app.navigator.JokeNavigator
 import com.gmail.harsh_chuck.app.navigator.JokeScreens
 import com.gmail.harsh_chuck.domain.AppController
+import com.gmail.harsh_chuck.helpers.errorTimber
 import com.jakewharton.rxbinding.view.clicks
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.core.Observable
@@ -31,6 +32,8 @@ class JokeByCategoryFragment : Fragment() {
     @Inject
     lateinit var jokeNavigator: JokeNavigator
 
+    private val errorLog = errorTimber
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -45,9 +48,7 @@ class JokeByCategoryFragment : Fragment() {
             .subscribe({
                 ((context?.applicationContext) as AppController).jokeCategoryLiveData.value = true
                 jokeNavigator.navigateTo(JokeScreens.JOKE)
-            }) {
-                errorLog(it)
-            }
+            }, errorLog)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -65,9 +66,7 @@ class JokeByCategoryFragment : Fragment() {
                             setActiveOkBtn(1F, true)
                         }
                     }
-                }) {
-                    errorLog(it)
-                }
+                }, errorLog)
         }
     }
 
@@ -79,19 +78,8 @@ class JokeByCategoryFragment : Fragment() {
     private fun backPressed() {
         btn_back.clicks()
             .subscribe({
+                ((context?.applicationContext) as AppController).jokeCategoryLiveData.value = false
                 findNavController().popBackStack()
-            }) {
-                errorLog(it)
-            }
-    }
-
-
-    private fun errorLog(throwable: Throwable) {
-        Timber.e(throwable)
-    }
-
-    override fun onDestroy() {
-        ((context?.applicationContext) as AppController).jokeCategoryLiveData.value = false
-        super.onDestroy()
+            }, errorLog)
     }
 }

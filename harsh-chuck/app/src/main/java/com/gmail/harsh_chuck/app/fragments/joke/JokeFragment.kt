@@ -4,18 +4,22 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.fragment.findNavController
 import com.gmail.harsh_chuck.R
-import com.gmail.harsh_chuck.app.adapters.RadioAdapter.Companion.selectedCategoriesJokes
 import com.gmail.harsh_chuck.domain.AppController
+import com.gmail.harsh_chuck.helpers.errorTimber
+import com.gmail.harsh_chuck.helpers.setText
 import com.gmail.harsh_chuck.network.INetworkService
 import com.jakewharton.rxbinding.view.clicks
 import dagger.hilt.android.AndroidEntryPoint
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.disposables.Disposable
 import kotlinx.android.synthetic.main.joke_fragment.*
-import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -25,10 +29,24 @@ class JokeFragment : Fragment() {
         fun newInstance() = JokeFragment()
     }
 
+    private var selectedCategoriesJokes = ""
+
     @Inject
     lateinit var networkService: INetworkService
 
+
+    private val errorLog = errorTimber
+
     private val viewModel: JokeViewModel by viewModels()
+
+    private val requestJokeByCategory: (String, INetworkService, JokeViewModel) -> Disposable =
+        { category: String, networkService: INetworkService, viewModel: JokeViewModel ->
+            viewModel.makeJokeByCategoryRequest(
+                networkService,
+                category
+            )
+        }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,18 +57,64 @@ class JokeFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        makeRequest()
-        jokesByCategoryLiveData()
+
+        (context?.applicationContext as AppController).stringData.observe(viewLifecycleOwner) { category ->
+            Observable.just(category)
+                .subscribe({
+                    selectedCategoriesJokes = it
+                    makeRequest(
+                        selectedCategoriesJokes,
+                        networkService,
+                        viewModel,
+                        requestJokeByCategory
+                    )
+                }, errorLog)
+        }
+
+        jokesByCategoryLiveData(
+            viewModel,
+            viewLifecycleOwner,
+            tv_joke,
+            setText,
+            errorTimber,
+            { textView: TextView,
+              setText: (TextView, String) -> Unit,
+              error: (Throwable) -> Unit, observable: Observable<String> ->
+                observable.observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        setText(textView, it)
+                    }) {
+                        error(it)
+                    }
+            }
+        )
     }
 
-    private fun jokesByCategoryLiveData() {
-        viewModel.jokesByCategoryLiveData.observe(viewLifecycleOwner) { joke ->
-            Observable.just(joke)
-                .subscribe({
-                    tv_joke.text = it
-                }) {
-                    errorLog(it)
-                }
+    /**
+     * метод подписываеться на события LiveDate которые были послены с класса выбора категорий шуток [CategoriesJokesAdapter]
+     * @param viewModel вью модель [JokeViewModel]
+     * @param lifecycleOwner жизненный цикл [LifecycleOwner]
+     * @param tvJoke текстовое поле [TextView]
+     * @param setText функция устанвовки текстового поля
+     * @param error функция обработки ошибки
+     * @param push функция обьединяющая все выше перечисленное
+     *
+     */
+    private fun jokesByCategoryLiveData(
+        viewModel: JokeViewModel,
+        lifecycleOwner: LifecycleOwner,
+        tvJoke: TextView,
+        setText: (TextView, String) -> Unit,
+        error: (Throwable) -> Unit,
+        push: (
+            TextView,
+            setText: (TextView, String) -> Unit,
+            error: (Throwable) -> Unit,
+            Observable<String>
+        ) -> Disposable
+    ) {
+        viewModel.jokesByCategoryLiveData.observe(lifecycleOwner) { joke ->
+            push(tvJoke, setText, error, Observable.just(joke))
         }
     }
 
@@ -63,25 +127,28 @@ class JokeFragment : Fragment() {
             .subscribe({
                 ((context?.applicationContext) as AppController).jokeCategoryLiveData.value = false
                 findNavController().popBackStack()
-            }) {
-                errorLog(it)
-            }
+            }, errorLog)
     }
 
     private fun newJokePressed() {
         btn_new_joke.clicks()
             .subscribe({
-                makeRequest()
-            }) {
-                errorLog(it)
-            }
+                makeRequest(
+                    selectedCategoriesJokes,
+                    networkService,
+                    viewModel,
+                    requestJokeByCategory
+                )
+            }, errorLog)
     }
 
-    private fun makeRequest() {
-        viewModel.makeJokeByCategoryRequest(networkService, selectedCategoriesJokes)
-    }
-
-    private fun errorLog(throwable: Throwable) {
-        Timber.e(throwable)
+    private fun makeRequest(
+        selectedCategoriesJokes: String,
+        networkService: INetworkService,
+        viewModel: JokeViewModel,
+        request: (String, INetworkService, JokeViewModel) -> Disposable
+    ): Disposable {
+        return request(selectedCategoriesJokes, networkService, viewModel)
     }
 }
+

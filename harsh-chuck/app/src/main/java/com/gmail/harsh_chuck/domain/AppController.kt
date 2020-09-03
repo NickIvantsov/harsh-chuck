@@ -10,7 +10,10 @@ import javax.inject.Inject
 @HiltAndroidApp
 class AppController : Application() {
 
-    val jokeCategoryLiveData = MutableLiveData<Boolean>()
+    val jokeCategoryLiveData: MutableLiveData<Boolean> by lazy { MutableLiveData<Boolean>() }
+    val stringData: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
 
     @Inject
     lateinit var releaseTree: ReleaseTree
