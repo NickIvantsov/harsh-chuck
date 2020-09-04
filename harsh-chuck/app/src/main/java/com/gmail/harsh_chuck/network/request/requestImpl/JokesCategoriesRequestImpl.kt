@@ -1,6 +1,7 @@
 package com.gmail.harsh_chuck.network.request.requestImpl
 
 import androidx.lifecycle.MutableLiveData
+import com.gmail.harsh_chuck.data.chuckApi.response.JokeRandomResponse
 import com.gmail.harsh_chuck.network.INetworkService
 import com.gmail.harsh_chuck.network.request.ICategoriesJokes
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers

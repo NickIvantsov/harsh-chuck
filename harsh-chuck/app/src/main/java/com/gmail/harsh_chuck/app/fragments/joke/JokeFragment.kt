@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.fragment.findNavController
 import com.gmail.harsh_chuck.R
+import com.gmail.harsh_chuck.data.chuckApi.response.JokeRandomResponse
 import com.gmail.harsh_chuck.domain.AppController
 import com.gmail.harsh_chuck.helpers.errorTimber
 import com.gmail.harsh_chuck.helpers.setText
@@ -79,10 +80,10 @@ class JokeFragment : Fragment() {
             errorTimber,
             { textView: TextView,
               setText: (TextView, String) -> Unit,
-              error: (Throwable) -> Unit, observable: Observable<String> ->
+              error: (Throwable) -> Unit, observable: Observable<JokeRandomResponse> ->
                 observable.observeOn(AndroidSchedulers.mainThread())
                     .subscribe({
-                        setText(textView, it)
+                        setText(textView, it.value)
                     }) {
                         error(it)
                     }
@@ -110,7 +111,7 @@ class JokeFragment : Fragment() {
             TextView,
             setText: (TextView, String) -> Unit,
             error: (Throwable) -> Unit,
-            Observable<String>
+            Observable<JokeRandomResponse>
         ) -> Disposable
     ) {
         viewModel.jokesByCategoryLiveData.observe(lifecycleOwner) { joke ->

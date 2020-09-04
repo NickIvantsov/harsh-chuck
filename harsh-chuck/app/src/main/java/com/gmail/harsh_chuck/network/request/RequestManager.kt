@@ -1,6 +1,7 @@
 package com.gmail.harsh_chuck.network.request
 
 import androidx.lifecycle.MutableLiveData
+import com.gmail.harsh_chuck.data.chuckApi.response.JokeRandomResponse
 import com.gmail.harsh_chuck.network.INetworkService
 import io.reactivex.rxjava3.disposables.Disposable
 import javax.inject.Inject
@@ -14,7 +15,7 @@ class RequestManager @Inject constructor(
     fun makeRandomJokesRequest(networkService: INetworkService): Disposable =
         randomJoke.makeRandomJokesRequest(networkService)
 
-    fun resultRandomJokeRequestLiveData(): MutableLiveData<String> =
+    fun resultRandomJokeRequestLiveData(): MutableLiveData<JokeRandomResponse> =
         randomJoke.resultRequestLiveData()
 
 
@@ -29,6 +30,6 @@ class RequestManager @Inject constructor(
         return jokeByCategory.makeRandomJokeByCategoryRequest(networkService, category)
     }
 
-    fun resultJokeByCategoryLiveData(): MutableLiveData<String> =
+    fun resultJokeByCategoryLiveData(): MutableLiveData<JokeRandomResponse> =
         jokeByCategory.resultRequestLiveData()
 }

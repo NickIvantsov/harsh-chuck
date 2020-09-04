@@ -55,7 +55,7 @@ class MainFragment : Fragment() {
         viewModel.jokeLiveData.observe(viewLifecycleOwner) { jokeText ->
             Observable.just(jokeText)
                 .subscribe({
-                    setTvJokeText(it)
+                    setTvJokeText(it.value)
                 }) {
                     errorLog(it)
                 }

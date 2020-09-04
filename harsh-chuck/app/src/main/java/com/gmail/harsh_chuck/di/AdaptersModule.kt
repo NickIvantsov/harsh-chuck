@@ -14,7 +14,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 class JokesCategoriesAdapterModule {
 
     @Provides
-    fun provideDatabase(@ApplicationContext appContext: Context): RadioAdapter<String> {
+    fun provideJokesCategoriesAdapter(
+        @ApplicationContext appContext: Context
+    ): RadioAdapter<String> {
         return CategoriesJokesAdapter(appContext)
     }
 
