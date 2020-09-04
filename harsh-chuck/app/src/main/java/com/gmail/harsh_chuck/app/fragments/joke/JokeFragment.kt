@@ -76,14 +76,18 @@ class JokeFragment : Fragment() {
             viewModel,
             viewLifecycleOwner,
             tv_joke,
+            tv_category,
             setText,
             errorTimber,
-            { textView: TextView,
+            { tvJoke: TextView,
+              tvCategory: TextView,
               setText: (TextView, String) -> Unit,
-              error: (Throwable) -> Unit, observable: Observable<JokeRandomResponse> ->
+              error: (Throwable) -> Unit,
+              observable: Observable<JokeRandomResponse> ->
                 observable.observeOn(AndroidSchedulers.mainThread())
                     .subscribe({
-                        setText(textView, it.value)
+                        setText(tvJoke, it.value)
+                        setText(tvCategory, it.categories.first() as String)
                     }) {
                         error(it)
                     }
@@ -105,9 +109,11 @@ class JokeFragment : Fragment() {
         viewModel: JokeViewModel,
         lifecycleOwner: LifecycleOwner,
         tvJoke: TextView,
+        tvCategory: TextView,
         setText: (TextView, String) -> Unit,
         error: (Throwable) -> Unit,
         push: (
+            TextView,
             TextView,
             setText: (TextView, String) -> Unit,
             error: (Throwable) -> Unit,
@@ -115,7 +121,7 @@ class JokeFragment : Fragment() {
         ) -> Disposable
     ) {
         viewModel.jokesByCategoryLiveData.observe(lifecycleOwner) { joke ->
-            push(tvJoke, setText, error, Observable.just(joke))
+            push(tvJoke, tvCategory, setText, error, Observable.just(joke))
         }
     }
 
@@ -126,7 +132,7 @@ class JokeFragment : Fragment() {
         newJokePressed()
         btn_category.clicks()
             .subscribe({
-                ((context?.applicationContext) as AppController).jokeCategoryLiveData.value = false
+                ((context?.applicationContext) as AppController).jokeCategoryLiveData.value = true
                 findNavController().popBackStack()
             }, errorLog)
     }

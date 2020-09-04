@@ -10,7 +10,14 @@ import javax.inject.Inject
 @HiltAndroidApp
 class AppController : Application() {
 
+    /**
+     * liveData предназначаеться для определения активности кнопки OK при отображении категорий
+     */
     val jokeCategoryLiveData: MutableLiveData<Boolean> by lazy { MutableLiveData<Boolean>() }
+
+    /**
+     * liveData служит для передачи данных между фрагментами
+     */
     val stringData: MutableLiveData<String> by lazy {
         MutableLiveData<String>()
     }

@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.gmail.harsh_chuck.R
 import com.gmail.harsh_chuck.app.adapters.RadioAdapter
 import com.gmail.harsh_chuck.app.navigator.AppNavigator
+import com.gmail.harsh_chuck.domain.AppController
 import com.gmail.harsh_chuck.helpers.errorTimber
 import com.gmail.harsh_chuck.network.INetworkService
 import dagger.hilt.android.AndroidEntryPoint
@@ -40,6 +41,11 @@ class CategoryJokesFragment : Fragment() {
     private val errorLog = errorTimber
     private val jokesCategoriesRequest = makeJokesCategoriesRequest
     private val categoriesLiveData = jokesCategoriesLiveData
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        ((context?.applicationContext) as AppController).jokeCategoryLiveData.value = false
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

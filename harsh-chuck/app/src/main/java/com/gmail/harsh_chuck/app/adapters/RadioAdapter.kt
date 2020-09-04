@@ -37,6 +37,7 @@ abstract class RadioAdapter<T>(context: Context) :
         init {
             val clickListener: View.OnClickListener = View.OnClickListener {
                 mSelectedItem = adapterPosition
+                ((mContext.applicationContext) as AppController).jokeCategoryLiveData.value = true
                 (mContext.applicationContext as AppController).stringData.value =
                     (mItems[mSelectedItem] as String)
                 notifyDataSetChanged()

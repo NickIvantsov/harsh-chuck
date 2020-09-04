@@ -11,12 +11,13 @@ import com.gmail.harsh_chuck.app.navigator.AppNavigator
 import com.gmail.harsh_chuck.app.navigator.JokeNavigator
 import com.gmail.harsh_chuck.app.navigator.JokeScreens
 import com.gmail.harsh_chuck.domain.AppController
+import com.gmail.harsh_chuck.helpers.disableBtn
+import com.gmail.harsh_chuck.helpers.enableBtn
 import com.gmail.harsh_chuck.helpers.errorTimber
 import com.jakewharton.rxbinding.view.clicks
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.core.Observable
 import kotlinx.android.synthetic.main.joke_by_categore_fragment.*
-import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -46,7 +47,7 @@ class JokeByCategoryFragment : Fragment() {
         backPressed()
         btn_ok.clicks()
             .subscribe({
-                ((context?.applicationContext) as AppController).jokeCategoryLiveData.value = true
+                ((context?.applicationContext) as AppController).jokeCategoryLiveData.value = false
                 jokeNavigator.navigateTo(JokeScreens.JOKE)
             }, errorLog)
     }
@@ -57,22 +58,17 @@ class JokeByCategoryFragment : Fragment() {
             viewLifecycleOwner
         ) { result ->
             Observable.just(result)
-                .subscribe({
+                .subscribe({ isActeve ->
                     when {
-                        it -> {
-                            setActiveOkBtn(0.3F, false)
+                        isActeve -> {
+                            enableBtn(btn_ok)
                         }
                         else -> {
-                            setActiveOkBtn(1F, true)
+                            disableBtn(btn_ok)
                         }
                     }
                 }, errorLog)
         }
-    }
-
-    private fun setActiveOkBtn(alpha: Float, isClickable: Boolean) {
-        btn_ok.alpha = alpha
-        btn_ok.isClickable = isClickable
     }
 
     private fun backPressed() {
