@@ -2,8 +2,8 @@ package com.gmail.harsh_chuck.network.request.requestImpl.randomJokesImpl
 
 import androidx.lifecycle.MutableLiveData
 import com.gmail.harsh_chuck.data.chuckApi.response.JokeRandomResponse
+import com.gmail.harsh_chuck.domain.repository.IChuckRepository
 import com.gmail.harsh_chuck.helpers.errorTimber
-import com.gmail.harsh_chuck.network.INetworkService
 import com.gmail.harsh_chuck.network.request.IJokeByCategory
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.Disposable
@@ -18,18 +18,22 @@ class RandomJokesByCategoryRequestImpl @Inject constructor() : IJokeByCategory {
 
 
     override fun makeRandomJokeByCategoryRequest(
-        networkService: INetworkService,
+        networkService: IChuckRepository,
         category: String
     ): Disposable {
         return makeRequest(networkService, category)
     }
 
     private fun makeRequest(
-        networkService: INetworkService,
+        networkService: IChuckRepository,
         category: String
     ): Disposable {
-        return networkService.getChuckApi().jokesRandom(category)
+        return networkService.jokesRandom(category)
             .subscribeOn(Schedulers.io())
+            .map {
+                networkService.insert(it)
+                it
+            }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ jokeResponse ->
                 jokeLiveData.value = jokeResponse

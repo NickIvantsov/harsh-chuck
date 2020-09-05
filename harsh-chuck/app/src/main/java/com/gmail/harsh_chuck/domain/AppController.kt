@@ -2,10 +2,12 @@ package com.gmail.harsh_chuck.domain
 
 import android.app.Application
 import androidx.lifecycle.MutableLiveData
+import com.facebook.stetho.Stetho
 import com.gmail.harsh_chuck.BuildConfig
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 import javax.inject.Inject
+
 
 @HiltAndroidApp
 class AppController : Application() {
@@ -30,9 +32,37 @@ class AppController : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        if (BuildConfig.DEBUG)
+        if (BuildConfig.DEBUG) {
             setTimberDebugTree()
-        else
+
+            // Create an InitializerBuilder
+            // Create an InitializerBuilder
+            val initializerBuilder = Stetho.newInitializerBuilder(this)
+
+            // Enable Chrome DevTools
+
+            // Enable Chrome DevTools
+            initializerBuilder.enableWebKitInspector(
+                Stetho.defaultInspectorModulesProvider(this)
+            )
+
+            // Enable command line interface
+
+            // Enable command line interface
+            initializerBuilder.enableDumpapp(
+                Stetho.defaultDumperPluginsProvider(this)
+            )
+
+            // Use the InitializerBuilder to generate an Initializer
+
+            // Use the InitializerBuilder to generate an Initializer
+            val initializer = initializerBuilder.build()
+
+            // Initialize Stetho with the Initializer
+
+            // Initialize Stetho with the Initializer
+            Stetho.initialize(initializer)
+        } else
             timberReleaseTreeInit()
 
     }

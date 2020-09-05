@@ -9,10 +9,11 @@ import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
-class DebugType : TypeVersion() {
+class DebugType @Inject constructor(val interceptor:HttpLoggingInterceptor ) : TypeVersion() {
 
-    private val interceptor = HttpLoggingInterceptor()
+//    private val interceptor = HttpLoggingInterceptor()
 
 
     override fun getVersionTypes(): VersionTypes = VersionTypes.DEBUG

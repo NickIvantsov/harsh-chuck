@@ -13,8 +13,8 @@ import com.gmail.harsh_chuck.R
 import com.gmail.harsh_chuck.app.adapters.RadioAdapter
 import com.gmail.harsh_chuck.app.navigator.AppNavigator
 import com.gmail.harsh_chuck.domain.AppController
+import com.gmail.harsh_chuck.domain.repository.IChuckRepository
 import com.gmail.harsh_chuck.helpers.errorTimber
-import com.gmail.harsh_chuck.network.INetworkService
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
@@ -28,7 +28,7 @@ class CategoryJokesFragment : Fragment() {
     }
 
     @Inject
-    lateinit var networkService: INetworkService
+    lateinit var chuckRepository: IChuckRepository
 
     @Inject
     lateinit var adapter: RadioAdapter<String>
@@ -56,7 +56,7 @@ class CategoryJokesFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        jokesCategoriesRequest(viewModel, networkService)
+        jokesCategoriesRequest(viewModel, chuckRepository)
         categoriesLiveData(viewModel, viewLifecycleOwner, adapter, errorLog)
     }
 
@@ -72,11 +72,10 @@ class CategoryJokesFragment : Fragment() {
 
     }
 
-
 }
 
-val makeJokesCategoriesRequest: (CategoryJokesViewModel, INetworkService) -> Disposable =
-    { viewModel: CategoryJokesViewModel, networkService: INetworkService ->
+val makeJokesCategoriesRequest: (CategoryJokesViewModel, IChuckRepository) -> Disposable =
+    { viewModel: CategoryJokesViewModel, networkService: IChuckRepository ->
         viewModel.makeJokesCategoriesRequest(networkService)
     }
 val jokesCategoriesLiveData =

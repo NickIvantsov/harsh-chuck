@@ -9,7 +9,7 @@ import androidx.fragment.app.viewModels
 import com.gmail.harsh_chuck.R
 import com.gmail.harsh_chuck.app.navigator.AppNavigator
 import com.gmail.harsh_chuck.app.navigator.Screens
-import com.gmail.harsh_chuck.network.INetworkService
+import com.gmail.harsh_chuck.domain.repository.IChuckRepository
 import com.jakewharton.rxbinding.view.clicks
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.core.Observable
@@ -22,12 +22,8 @@ class MainFragment : Fragment() {
     companion object {
         fun newInstance() = MainFragment()
     }
-
     @Inject
-    lateinit var mainViewModelFactory: MainViewModelFactory
-
-    @Inject
-    lateinit var networkService: INetworkService
+    lateinit var chuckRepository: IChuckRepository
 
     @Inject
     lateinit var navigator: AppNavigator
@@ -97,7 +93,7 @@ class MainFragment : Fragment() {
     }
 
     private fun newJokeRequest() {
-        viewModel.makeRandomJokesRequest(networkService)
+        viewModel.makeRandomJokesRequest(chuckRepository)
     }
 
     private fun setTvJokeText(textValue: String) {

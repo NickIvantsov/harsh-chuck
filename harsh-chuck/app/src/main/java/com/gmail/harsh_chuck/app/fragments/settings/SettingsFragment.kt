@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.gmail.harsh_chuck.R
 import com.gmail.harsh_chuck.app.adapters.RadioAdapter
-import com.gmail.harsh_chuck.network.INetworkService
+import com.gmail.harsh_chuck.domain.repository.IChuckRepository
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.core.Observable
 import timber.log.Timber
@@ -24,7 +24,7 @@ class SettingsFragment : Fragment() {
     }
 
     @Inject
-    lateinit var networkService: INetworkService
+    lateinit var chuckRepository: IChuckRepository
 
     @Inject
     lateinit var adapter: RadioAdapter<String>
@@ -45,7 +45,7 @@ class SettingsFragment : Fragment() {
     }
 
     private fun makeJokesCategoriesRequest() {
-        viewModel.makeJokesCategoriesRequest(networkService)
+        viewModel.makeJokesCategoriesRequest(chuckRepository)
     }
 
     private fun jokesCategoriesLiveData() {

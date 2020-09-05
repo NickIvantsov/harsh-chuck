@@ -12,9 +12,9 @@ import androidx.navigation.fragment.findNavController
 import com.gmail.harsh_chuck.R
 import com.gmail.harsh_chuck.data.chuckApi.response.JokeRandomResponse
 import com.gmail.harsh_chuck.domain.AppController
+import com.gmail.harsh_chuck.domain.repository.IChuckRepository
 import com.gmail.harsh_chuck.helpers.errorTimber
 import com.gmail.harsh_chuck.helpers.setText
-import com.gmail.harsh_chuck.network.INetworkService
 import com.jakewharton.rxbinding.view.clicks
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -33,15 +33,15 @@ class JokeFragment : Fragment() {
     private var selectedCategoriesJokes = ""
 
     @Inject
-    lateinit var networkService: INetworkService
+    lateinit var chuckRepository: IChuckRepository
 
 
     private val errorLog = errorTimber
 
     private val viewModel: JokeViewModel by viewModels()
 
-    private val requestJokeByCategory: (String, INetworkService, JokeViewModel) -> Disposable =
-        { category: String, networkService: INetworkService, viewModel: JokeViewModel ->
+    private val requestJokeByCategory: (String, IChuckRepository, JokeViewModel) -> Disposable =
+        { category: String, networkService: IChuckRepository, viewModel: JokeViewModel ->
             viewModel.makeJokeByCategoryRequest(
                 networkService,
                 category
@@ -65,7 +65,7 @@ class JokeFragment : Fragment() {
                     selectedCategoriesJokes = it
                     makeRequest(
                         selectedCategoriesJokes,
-                        networkService,
+                        chuckRepository,
                         viewModel,
                         requestJokeByCategory
                     )
@@ -142,7 +142,7 @@ class JokeFragment : Fragment() {
             .subscribe({
                 makeRequest(
                     selectedCategoriesJokes,
-                    networkService,
+                    chuckRepository,
                     viewModel,
                     requestJokeByCategory
                 )
@@ -151,9 +151,9 @@ class JokeFragment : Fragment() {
 
     private fun makeRequest(
         selectedCategoriesJokes: String,
-        networkService: INetworkService,
+        networkService: IChuckRepository,
         viewModel: JokeViewModel,
-        request: (String, INetworkService, JokeViewModel) -> Disposable
+        request: (String, IChuckRepository, JokeViewModel) -> Disposable
     ): Disposable {
         return request(selectedCategoriesJokes, networkService, viewModel)
     }

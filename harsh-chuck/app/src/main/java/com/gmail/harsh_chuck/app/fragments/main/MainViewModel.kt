@@ -4,7 +4,7 @@ import android.os.Environment
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
 import com.gmail.harsh_chuck.app.activities.FileUtil
-import com.gmail.harsh_chuck.network.INetworkService
+import com.gmail.harsh_chuck.domain.repository.IChuckRepository
 import com.gmail.harsh_chuck.network.request.RequestManager
 import io.reactivex.rxjava3.disposables.Disposable
 import timber.log.Timber
@@ -14,7 +14,7 @@ class MainViewModel @ViewModelInject constructor(val requestManager: RequestMana
 
     val jokeLiveData = requestManager.resultRandomJokeRequestLiveData()
 
-    fun makeRandomJokesRequest(networkService: INetworkService): Disposable {
+    fun makeRandomJokesRequest(networkService: IChuckRepository): Disposable {
         return requestManager.makeRandomJokesRequest(networkService)
     }
 

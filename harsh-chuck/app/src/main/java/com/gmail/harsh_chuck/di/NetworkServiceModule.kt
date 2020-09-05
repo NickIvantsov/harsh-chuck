@@ -15,4 +15,6 @@ abstract class NetworkServiceModule {
     @Singleton
     @Binds
     abstract fun bindNetworkService(impl: NetworkService): INetworkService
+
+
 }

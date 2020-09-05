@@ -7,8 +7,9 @@ import okhttp3.ConnectionSpec
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
-class ProductionType : TypeVersion() {
+class ProductionType @Inject constructor() : TypeVersion() {
     protected val builder = OkHttpClient.Builder()
         .readTimeout(10, TimeUnit.SECONDS)//todo хардкод
         .connectTimeout(10, TimeUnit.SECONDS)//todo хардкод

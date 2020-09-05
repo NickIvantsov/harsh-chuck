@@ -15,8 +15,8 @@ object ReleaseTreeModule {
 
     @Singleton
     @Provides
-    fun bindReleaseTree(application: Application): ReleaseTree {
-        return ReleaseTree(application)
+    fun bindReleaseTree(): ReleaseTree {
+        return ReleaseTree()
     }
 }
 
