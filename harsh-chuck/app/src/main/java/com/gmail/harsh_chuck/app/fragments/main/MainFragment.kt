@@ -6,10 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.MutableLiveData
 import com.gmail.harsh_chuck.R
 import com.gmail.harsh_chuck.app.navigator.AppNavigator
 import com.gmail.harsh_chuck.app.navigator.Screens
+import com.gmail.harsh_chuck.data.chuckApi.response.JokeRandomResponse
 import com.gmail.harsh_chuck.domain.repository.IChuckRepository
+import com.gmail.harsh_chuck.helpers.errorTimber
 import com.jakewharton.rxbinding.view.clicks
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.core.Observable
@@ -22,6 +25,7 @@ class MainFragment : Fragment() {
     companion object {
         fun newInstance() = MainFragment()
     }
+
     @Inject
     lateinit var chuckRepository: IChuckRepository
 
@@ -29,6 +33,9 @@ class MainFragment : Fragment() {
     lateinit var navigator: AppNavigator
 
     private val viewModel: MainViewModel by viewModels()
+
+    @Inject
+    lateinit var jokeLiveData: MutableLiveData<JokeRandomResponse>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,7 +46,7 @@ class MainFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        newJokeRequest()
+        newJokeRequest(viewModel, chuckRepository, jokeLiveData, errorTimber)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -48,7 +55,7 @@ class MainFragment : Fragment() {
     }
 
     private fun jokeLiveData() {
-        viewModel.jokeLiveData.observe(viewLifecycleOwner) { jokeText ->
+        jokeLiveData.observe(viewLifecycleOwner) { jokeText ->
             Observable.just(jokeText)
                 .subscribe({
                     setTvJokeText(it.value)
@@ -61,7 +68,6 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         newRandomPressed()
-//        settingsPressed()
         jokeByCategoryPressed()
     }
 
@@ -86,14 +92,14 @@ class MainFragment : Fragment() {
     private fun newRandomPressed() {
         new_random.clicks()
             .subscribe({
-                newJokeRequest()
-            }) {
-                errorLog(it)
-            }
+                newJokeRequest(viewModel, chuckRepository, jokeLiveData, errorTimber)
+            }, errorTimber)
     }
 
-    private fun newJokeRequest() {
-        viewModel.makeRandomJokesRequest(chuckRepository)
+    val newJokeRequest = { viewModel: MainViewModel, networkService: IChuckRepository,
+                           liveData: MutableLiveData<JokeRandomResponse>,
+                           error: (Throwable) -> Unit ->
+        viewModel.makeRandomJokesRequest(networkService, liveData, error)
     }
 
     private fun setTvJokeText(textValue: String) {

@@ -8,6 +8,8 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.MutableLiveData
+import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.gmail.harsh_chuck.R
 import com.gmail.harsh_chuck.data.chuckApi.response.JokeRandomResponse
@@ -40,11 +42,29 @@ class JokeFragment : Fragment() {
 
     private val viewModel: JokeViewModel by viewModels()
 
-    private val requestJokeByCategory: (String, IChuckRepository, JokeViewModel) -> Disposable =
-        { category: String, networkService: IChuckRepository, viewModel: JokeViewModel ->
+    @Inject
+    lateinit var jokeResponseLiveData: MutableLiveData<JokeRandomResponse>
+
+    private val popBackStack: (NavController) -> Boolean = { navController: NavController ->
+        navController.popBackStack()
+    }
+
+    private val requestJokeByCategory: (
+        IChuckRepository,
+        String,
+        MutableLiveData<JokeRandomResponse>,
+        (Throwable) -> Unit,
+        JokeViewModel
+    ) -> Disposable =
+        { networkService: IChuckRepository,
+          category: String,
+          liveData: MutableLiveData<JokeRandomResponse>,
+          error: (Throwable) -> Unit,
+          viewModel: JokeViewModel ->
             viewModel.makeJokeByCategoryRequest(
                 networkService,
-                category
+                category,
+                liveData, error
             )
         }
 
@@ -67,13 +87,15 @@ class JokeFragment : Fragment() {
                         selectedCategoriesJokes,
                         chuckRepository,
                         viewModel,
+                        jokeResponseLiveData,
+                        errorLog,
                         requestJokeByCategory
                     )
                 }, errorLog)
         }
 
         jokesByCategoryLiveData(
-            viewModel,
+            jokeResponseLiveData,
             viewLifecycleOwner,
             tv_joke,
             tv_category,
@@ -87,7 +109,7 @@ class JokeFragment : Fragment() {
                 observable.observeOn(AndroidSchedulers.mainThread())
                     .subscribe({
                         setText(tvJoke, it.value)
-                        setText(tvCategory, it.categories.first() as String)
+                        setText(tvCategory, it.categories.first())
                     }) {
                         error(it)
                     }
@@ -106,7 +128,7 @@ class JokeFragment : Fragment() {
      *
      */
     private fun jokesByCategoryLiveData(
-        viewModel: JokeViewModel,
+        jokeResponseLiveData: MutableLiveData<JokeRandomResponse>,
         lifecycleOwner: LifecycleOwner,
         tvJoke: TextView,
         tvCategory: TextView,
@@ -120,7 +142,7 @@ class JokeFragment : Fragment() {
             Observable<JokeRandomResponse>
         ) -> Disposable
     ) {
-        viewModel.jokesByCategoryLiveData.observe(lifecycleOwner) { joke ->
+        jokeResponseLiveData.observe(lifecycleOwner) { joke ->
             push(tvJoke, tvCategory, setText, error, Observable.just(joke))
         }
     }
@@ -133,9 +155,10 @@ class JokeFragment : Fragment() {
         btn_category.clicks()
             .subscribe({
                 ((context?.applicationContext) as AppController).jokeCategoryLiveData.value = true
-                findNavController().popBackStack()
+                popBackStack(findNavController())
             }, errorLog)
     }
+
 
     private fun newJokePressed() {
         btn_new_joke.clicks()
@@ -144,6 +167,8 @@ class JokeFragment : Fragment() {
                     selectedCategoriesJokes,
                     chuckRepository,
                     viewModel,
+                    jokeResponseLiveData,
+                    errorLog,
                     requestJokeByCategory
                 )
             }, errorLog)
@@ -153,9 +178,17 @@ class JokeFragment : Fragment() {
         selectedCategoriesJokes: String,
         networkService: IChuckRepository,
         viewModel: JokeViewModel,
-        request: (String, IChuckRepository, JokeViewModel) -> Disposable
+        liveData: MutableLiveData<JokeRandomResponse>,
+        error: (Throwable) -> Unit,
+        request: (
+            IChuckRepository,
+            String,
+            MutableLiveData<JokeRandomResponse>,
+            (Throwable) -> Unit,
+            JokeViewModel
+        ) -> Disposable
     ): Disposable {
-        return request(selectedCategoriesJokes, networkService, viewModel)
+        return request(networkService, selectedCategoriesJokes, liveData, error, viewModel)
     }
 }
 

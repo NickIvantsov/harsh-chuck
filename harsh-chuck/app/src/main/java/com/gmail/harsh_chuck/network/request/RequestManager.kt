@@ -12,12 +12,12 @@ class RequestManager @Inject constructor(
     val jokeByCategory: IJokeByCategory
 ) {
 
-    fun makeRandomJokesRequest(networkService: IChuckRepository): Disposable =
-        randomJoke.makeRandomJokesRequest(networkService)
-
-    fun resultRandomJokeRequestLiveData(): MutableLiveData<JokeRandomResponse> =
-        randomJoke.resultRequestLiveData()
-
+    fun makeRandomJokesRequest(
+        networkService: IChuckRepository,
+        liveData: MutableLiveData<JokeRandomResponse>,
+        error: (Throwable) -> Unit
+    ): Disposable =
+        randomJoke.makeRandomJokesRequest(networkService, liveData, error)
 
     fun makeJokesCategoriesRequest(networkService: IChuckRepository): Disposable {
         return categoriesJokes.makeJokesCategoriesRequest(networkService)
@@ -26,10 +26,17 @@ class RequestManager @Inject constructor(
     fun resultJokesCategoriesLiveData(): MutableLiveData<String> =
         categoriesJokes.resultRequestLiveData()
 
-    fun makeJokeByCategoryRequest(networkService: IChuckRepository, category: String): Disposable {
-        return jokeByCategory.makeRandomJokeByCategoryRequest(networkService, category)
+    fun makeJokeByCategoryRequest(
+        networkService: IChuckRepository,
+        category: String,
+        liveData: MutableLiveData<JokeRandomResponse>,
+        error: (Throwable) -> Unit
+    ): Disposable {
+        return jokeByCategory.makeRandomJokeByCategoryRequest(
+            networkService,
+            category,
+            liveData,
+            error
+        )
     }
-
-    fun resultJokeByCategoryLiveData(): MutableLiveData<JokeRandomResponse> =
-        jokeByCategory.resultRequestLiveData()
 }
