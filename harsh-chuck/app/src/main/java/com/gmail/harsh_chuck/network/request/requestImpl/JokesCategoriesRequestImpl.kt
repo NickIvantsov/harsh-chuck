@@ -7,12 +7,15 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
-import timber.log.Timber
 import javax.inject.Inject
 
 class JokesCategoriesRequestImpl @Inject constructor() : ICategoriesJokes {
-    val jokesCategoriesLiveData = MutableLiveData<String>()
-    override fun makeJokesCategoriesRequest(networkService: IChuckRepository): Disposable {
+
+    override fun makeJokesCategoriesRequest(
+        networkService: IChuckRepository,
+        liveData: MutableLiveData<String>,
+        error: (Throwable) -> Unit
+    ): Disposable {
         return networkService.jokesCategories()
             .subscribeOn(Schedulers.io())
             .map {
@@ -32,11 +35,8 @@ class JokesCategoriesRequestImpl @Inject constructor() : ICategoriesJokes {
             }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ responseItem ->
-                jokesCategoriesLiveData.value = responseItem
-            }) {
-                Timber.e(it)
-            }
+                liveData.value = responseItem
+            }, error)
     }
 
-    override fun resultRequestLiveData(): MutableLiveData<String> = jokesCategoriesLiveData
 }

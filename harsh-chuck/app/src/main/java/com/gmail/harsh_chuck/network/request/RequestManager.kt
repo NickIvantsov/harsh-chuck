@@ -19,12 +19,13 @@ class RequestManager @Inject constructor(
     ): Disposable =
         randomJoke.makeRandomJokesRequest(networkService, liveData, error)
 
-    fun makeJokesCategoriesRequest(networkService: IChuckRepository): Disposable {
-        return categoriesJokes.makeJokesCategoriesRequest(networkService)
+    fun makeJokesCategoriesRequest(
+        networkService: IChuckRepository,
+        liveData: MutableLiveData<String>,
+        error: (Throwable) -> Unit
+    ): Disposable {
+        return categoriesJokes.makeJokesCategoriesRequest(networkService, liveData, error)
     }
-
-    fun resultJokesCategoriesLiveData(): MutableLiveData<String> =
-        categoriesJokes.resultRequestLiveData()
 
     fun makeJokeByCategoryRequest(
         networkService: IChuckRepository,

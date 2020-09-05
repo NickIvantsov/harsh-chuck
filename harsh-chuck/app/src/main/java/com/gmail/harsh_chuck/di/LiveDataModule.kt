@@ -14,4 +14,9 @@ object LiveDataModule {
     fun provideJokeLiveData(): MutableLiveData<JokeRandomResponse> {
         return MutableLiveData<JokeRandomResponse>()
     }
+
+    @Provides
+    fun provideCategoryLiveData(): MutableLiveData<String> {
+        return MutableLiveData<String>()
+    }
 }

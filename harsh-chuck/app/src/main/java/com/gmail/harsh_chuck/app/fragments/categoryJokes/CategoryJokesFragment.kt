@@ -7,11 +7,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.gmail.harsh_chuck.R
 import com.gmail.harsh_chuck.app.adapters.RadioAdapter
-import com.gmail.harsh_chuck.app.navigator.AppNavigator
 import com.gmail.harsh_chuck.domain.AppController
 import com.gmail.harsh_chuck.domain.repository.IChuckRepository
 import com.gmail.harsh_chuck.helpers.errorTimber
@@ -19,6 +19,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
 import javax.inject.Inject
+import javax.inject.Provider
 
 @AndroidEntryPoint
 class CategoryJokesFragment : Fragment() {
@@ -31,16 +32,43 @@ class CategoryJokesFragment : Fragment() {
     lateinit var chuckRepository: IChuckRepository
 
     @Inject
-    lateinit var adapter: RadioAdapter<String>
+    lateinit var radioAdapter: RadioAdapter<String>
 
     @Inject
-    lateinit var navigator: AppNavigator
+    lateinit var jokesLiveData: MutableLiveData<String>
+
+    @Inject
+    lateinit var linearLayoutManager: Provider<LinearLayoutManager>
 
     private val viewModel: CategoryJokesViewModel by viewModels()
 
+    private val makeJokesCategoriesRequest: (
+        CategoryJokesViewModel,
+        IChuckRepository,
+        MutableLiveData<String>,
+        (Throwable) -> Unit
+    ) -> Disposable =
+        { viewModel: CategoryJokesViewModel, networkService: IChuckRepository,
+          liveData: MutableLiveData<String>,
+          error: (Throwable) -> Unit ->
+            viewModel.makeJokesCategoriesRequest(networkService, liveData, error)
+        }
+
+    private val jokesCategoriesLiveData =
+        { jokesLiveData: MutableLiveData<String>,
+          viewLifecycleOwner: LifecycleOwner,
+          adapter: RadioAdapter<String>,
+          error: (Throwable) -> Unit ->
+            jokesLiveData.observe(viewLifecycleOwner) { categories ->
+                Observable
+                    .just(categories)
+                    .subscribe({
+                        adapter.addItem(it)
+                    }, error)
+            }
+        }
+
     private val errorLog = errorTimber
-    private val jokesCategoriesRequest = makeJokesCategoriesRequest
-    private val categoriesLiveData = jokesCategoriesLiveData
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,38 +84,21 @@ class CategoryJokesFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        jokesCategoriesRequest(viewModel, chuckRepository)
-        categoriesLiveData(viewModel, viewLifecycleOwner, adapter, errorLog)
+        makeJokesCategoriesRequest(viewModel, chuckRepository, jokesLiveData, errorLog)
+        jokesCategoriesLiveData(jokesLiveData, viewLifecycleOwner, radioAdapter, errorLog)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val recyclerView = view.findViewById<RecyclerView>(R.id.rv_categories)
-        context?.let {
-            recyclerView.adapter = adapter
+        view.findViewById<RecyclerView>(R.id.rv_categories).apply {
+            adapter = radioAdapter
+            layoutManager = linearLayoutManager.get()
         }
 
-        recyclerView.layoutManager = LinearLayoutManager(context)
 
     }
 
 }
 
-val makeJokesCategoriesRequest: (CategoryJokesViewModel, IChuckRepository) -> Disposable =
-    { viewModel: CategoryJokesViewModel, networkService: IChuckRepository ->
-        viewModel.makeJokesCategoriesRequest(networkService)
-    }
-val jokesCategoriesLiveData =
-    { viewModel: CategoryJokesViewModel,
-      viewLifecycleOwner: LifecycleOwner,
-      adapter: RadioAdapter<String>,
-      error: (Throwable) -> Unit ->
-        viewModel.jokesCategoriesLiveData.observe(viewLifecycleOwner) { categories ->
-            Observable
-                .just(categories)
-                .subscribe({
-                    adapter.addItem(it)
-                }, error)
-        }
-    }
+

@@ -5,6 +5,10 @@ import com.gmail.harsh_chuck.domain.repository.IChuckRepository
 import io.reactivex.rxjava3.disposables.Disposable
 
 interface ICategoriesJokes {
-    fun resultRequestLiveData(): MutableLiveData<String>
-    fun makeJokesCategoriesRequest(networkService: IChuckRepository): Disposable
+
+    fun makeJokesCategoriesRequest(
+        networkService: IChuckRepository,
+        liveData: MutableLiveData<String>,
+        error: (Throwable) -> Unit
+    ): Disposable
 }

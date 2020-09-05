@@ -13,6 +13,7 @@ import com.gmail.harsh_chuck.app.navigator.Screens
 import com.gmail.harsh_chuck.data.chuckApi.response.JokeRandomResponse
 import com.gmail.harsh_chuck.domain.repository.IChuckRepository
 import com.gmail.harsh_chuck.helpers.errorTimber
+import com.gmail.harsh_chuck.helpers.setText
 import com.jakewharton.rxbinding.view.clicks
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.core.Observable
@@ -37,6 +38,9 @@ class MainFragment : Fragment() {
     @Inject
     lateinit var jokeLiveData: MutableLiveData<JokeRandomResponse>
 
+    private val errorLog = errorTimber
+    private val setTextToView = setText
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -58,10 +62,8 @@ class MainFragment : Fragment() {
         jokeLiveData.observe(viewLifecycleOwner) { jokeText ->
             Observable.just(jokeText)
                 .subscribe({
-                    setTvJokeText(it.value)
-                }) {
-                    errorLog(it)
-                }
+                    setTextToView(tv_joke, it.value)
+                }, errorLog)
         }
     }
 
@@ -75,25 +77,14 @@ class MainFragment : Fragment() {
         btn_joke_by_category.clicks()
             .subscribe({
                 navigator.navigateTo(Screens.JOKE_BY_CATEGORY)
-            }) {
-                errorLog(it)
-            }
-    }
-
-    private fun settingsPressed() {
-        btn_settings.clicks()
-            .subscribe({
-                navigator.navigateTo(Screens.SETTINGS)
-            }) {
-                errorLog(it)
-            }
+            }, errorLog)
     }
 
     private fun newRandomPressed() {
         new_random.clicks()
             .subscribe({
                 newJokeRequest(viewModel, chuckRepository, jokeLiveData, errorTimber)
-            }, errorTimber)
+            }, errorLog)
     }
 
     val newJokeRequest = { viewModel: MainViewModel, networkService: IChuckRepository,
@@ -101,13 +92,4 @@ class MainFragment : Fragment() {
                            error: (Throwable) -> Unit ->
         viewModel.makeRandomJokesRequest(networkService, liveData, error)
     }
-
-    private fun setTvJokeText(textValue: String) {
-        tv_joke.text = textValue
-    }
-
-    private fun errorLog(it: Throwable?) {
-        viewModel.errorLog(it)
-    }
-
 }

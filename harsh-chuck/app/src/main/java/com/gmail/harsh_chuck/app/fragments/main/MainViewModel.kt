@@ -36,8 +36,4 @@ class MainViewModel @ViewModelInject constructor(val requestManager: RequestMana
         fos.write(bytearray)
         fos.close()
     }
-
-    fun errorLog(it: Throwable?) {
-        Timber.e(it)
-    }
 }

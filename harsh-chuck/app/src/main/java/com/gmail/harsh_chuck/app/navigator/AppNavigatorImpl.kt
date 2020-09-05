@@ -13,7 +13,6 @@ class AppNavigatorImpl @Inject constructor(private val activity: FragmentActivit
     override fun navigateTo(screen: Screens) {
         val fragment: Int = when (screen) {
             Screens.MAIN -> R.id.mainFragment
-            Screens.SETTINGS -> R.id.settingsFragment
             Screens.JOKE_BY_CATEGORY -> R.id.jokeByCategoryFragment
             Screens.JOKE -> R.id.jokeFragment
         }
