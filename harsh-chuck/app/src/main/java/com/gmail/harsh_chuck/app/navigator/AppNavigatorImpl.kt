@@ -15,6 +15,7 @@ class AppNavigatorImpl @Inject constructor(private val activity: FragmentActivit
             Screens.MAIN -> R.id.mainFragment
             Screens.JOKE_BY_CATEGORY -> R.id.jokeByCategoryFragment
             Screens.JOKE -> R.id.jokeFragment
+            Screens.NEW_RANDOM_JOKE -> R.id.newRandomJokeFragment
         }
         activity.findNavController(R.id.my_nav_host_fragment).navigate(fragment)
     }

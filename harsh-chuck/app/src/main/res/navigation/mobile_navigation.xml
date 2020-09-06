@@ -13,10 +13,18 @@
         <action
             android:id="@+id/action_mainFragment_to_jokeByCategoryFragment"
             app:destination="@id/jokeByCategoryFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_newRandomJokeFragment"
+            app:destination="@id/newRandomJokeFragment" />
     </fragment>
     <fragment
         android:id="@+id/jokeByCategoryFragment"
         android:name="com.gmail.harsh_chuck.app.fragments.jokeByCategory.JokeByCategoryFragment"
         android:label="joke_by_categore_fragment"
         tools:layout="@layout/joke_by_categore_fragment" />
+    <fragment
+        android:id="@+id/newRandomJokeFragment"
+        android:name="com.gmail.harsh_chuck.app.fragments.newRandomJoke.NewRandomJokeFragment"
+        android:label="new_random_joke_fragment"
+        tools:layout="@layout/new_random_joke_fragment" />
 </navigation>

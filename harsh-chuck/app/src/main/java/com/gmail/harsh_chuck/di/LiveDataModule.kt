@@ -7,6 +7,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
 
+
 @InstallIn(ActivityComponent::class)
 @Module
 object LiveDataModule {
@@ -19,4 +20,5 @@ object LiveDataModule {
     fun provideCategoryLiveData(): MutableLiveData<String> {
         return MutableLiveData<String>()
     }
+
 }

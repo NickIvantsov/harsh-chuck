@@ -6,7 +6,8 @@ package com.gmail.harsh_chuck.app.navigator
 enum class Screens {
     MAIN,
     JOKE_BY_CATEGORY,
-    JOKE
+    JOKE,
+    NEW_RANDOM_JOKE
 }
 
 /**

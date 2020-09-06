@@ -187,4 +187,7 @@ dependencies {
 
     //Stetcho
     implementation 'com.facebook.stetho:stetho:1.5.1'
+
+    //Cardview
+    implementation "androidx.cardview:cardview:1.0.0"
 }

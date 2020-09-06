@@ -23,24 +23,83 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <Button
-            android:id="@+id/new_random"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="32dp"
+            android:id="@+id/btn_new_random"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:backgroundTint="@color/colorPrimaryDark"
             android:text="New random joke"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            android:textColor="@android:color/white"
+            app:layout_constraintBottom_toTopOf="@+id/guideline5"
+            app:layout_constraintEnd_toStartOf="@+id/guideline7"
+            app:layout_constraintStart_toStartOf="@+id/guideline4"
+            app:layout_constraintTop_toTopOf="@+id/guideline3" />
 
         <Button
             android:id="@+id/btn_joke_by_category"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:backgroundTint="@color/colorPrimaryDark"
+            android:text="New random joke by categore"
+            android:textColor="@android:color/white"
+            app:layout_constraintBottom_toTopOf="@+id/guideline5"
+            app:layout_constraintEnd_toStartOf="@+id/guideline4"
+            app:layout_constraintStart_toStartOf="@+id/guideline2"
+            app:layout_constraintTop_toTopOf="@+id/guideline3" />
+
+
+        <Button
+            android:id="@+id/btn_joke_history"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:backgroundTint="@color/colorPrimaryDark"
+            android:text="Joke history"
+            android:textColor="@android:color/white"
+            app:layout_constraintBottom_toTopOf="@+id/guideline6"
+            app:layout_constraintEnd_toStartOf="@+id/guideline4"
+            app:layout_constraintStart_toStartOf="@+id/guideline2"
+            app:layout_constraintTop_toBottomOf="@+id/btn_joke_by_category" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="32dp"
-            android:text="New random joke by categore"
-            app:layout_constraintBottom_toTopOf="@+id/new_random"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.04" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.01" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.50" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.2" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.96" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.40218878" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

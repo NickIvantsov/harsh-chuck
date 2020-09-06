@@ -4,8 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
 import com.gmail.harsh_chuck.R
 import com.gmail.harsh_chuck.app.navigator.AppNavigator
@@ -13,10 +13,8 @@ import com.gmail.harsh_chuck.app.navigator.Screens
 import com.gmail.harsh_chuck.data.chuckApi.response.JokeRandomResponse
 import com.gmail.harsh_chuck.domain.repository.IChuckRepository
 import com.gmail.harsh_chuck.helpers.errorTimber
-import com.gmail.harsh_chuck.helpers.setText
 import com.jakewharton.rxbinding.view.clicks
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.rxjava3.core.Observable
 import kotlinx.android.synthetic.main.main_fragment.*
 import javax.inject.Inject
 
@@ -33,13 +31,15 @@ class MainFragment : Fragment() {
     @Inject
     lateinit var navigator: AppNavigator
 
-    private val viewModel: MainViewModel by viewModels()
-
     @Inject
     lateinit var jokeLiveData: MutableLiveData<JokeRandomResponse>
 
     private val errorLog = errorTimber
-    private val setTextToView = setText
+
+    private val navigateTo = { navigator: AppNavigator, screen: Screens ->
+        navigator.navigateTo(screen)
+    }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -48,48 +48,37 @@ class MainFragment : Fragment() {
         return inflater.inflate(R.layout.main_fragment, container, false)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        newJokeRequest(viewModel, chuckRepository, jokeLiveData, errorTimber)
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        jokeLiveData()
-    }
-
-    private fun jokeLiveData() {
-        jokeLiveData.observe(viewLifecycleOwner) { jokeText ->
-            Observable.just(jokeText)
-                .subscribe({
-                    setTextToView(tv_joke, it.value)
-                }, errorLog)
-        }
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        newRandomPressed()
-        jokeByCategoryPressed()
+        btnPressed(
+            btn_joke_by_category,
+            navigator,
+            Screens.JOKE_BY_CATEGORY,
+            navigateTo,
+            errorLog
+        )
+        btnPressed(
+            btn_new_random,
+            navigator, Screens.NEW_RANDOM_JOKE,
+            navigateTo,
+            errorLog
+        )
     }
 
-    private fun jokeByCategoryPressed() {
-        btn_joke_by_category.clicks()
+
+    private fun btnPressed(
+        btn: Button,
+        appNavigator: AppNavigator,
+        screen: Screens,
+        navigator: (AppNavigator, Screens) -> Unit,
+        errorClick: (Throwable) -> Unit
+    ) {
+        btn.clicks()
             .subscribe({
-                navigator.navigateTo(Screens.JOKE_BY_CATEGORY)
-            }, errorLog)
+                navigator(appNavigator, screen)
+            }, errorClick)
     }
 
-    private fun newRandomPressed() {
-        new_random.clicks()
-            .subscribe({
-                newJokeRequest(viewModel, chuckRepository, jokeLiveData, errorTimber)
-            }, errorLog)
-    }
 
-    val newJokeRequest = { viewModel: MainViewModel, networkService: IChuckRepository,
-                           liveData: MutableLiveData<JokeRandomResponse>,
-                           error: (Throwable) -> Unit ->
-        viewModel.makeRandomJokesRequest(networkService, liveData, error)
-    }
 }

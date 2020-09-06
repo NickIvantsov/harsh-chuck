@@ -1,9 +1,11 @@
 package com.gmail.harsh_chuck.app.fragments.joke
 
 import android.os.Bundle
+import android.text.method.ScrollingMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -12,6 +14,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.gmail.harsh_chuck.R
+import com.gmail.harsh_chuck.app.navigator.popBackStack
 import com.gmail.harsh_chuck.data.chuckApi.response.JokeRandomResponse
 import com.gmail.harsh_chuck.domain.AppController
 import com.gmail.harsh_chuck.domain.repository.IChuckRepository
@@ -32,7 +35,35 @@ class JokeFragment : Fragment() {
         fun newInstance() = JokeFragment()
     }
 
-    private var selectedCategoriesJokes = ""
+    val stringDataLiveDataObservable = { liveData: MutableLiveData<String>,
+                                         lifecycleOwner: LifecycleOwner,
+                                         viewModel: JokeViewModel,
+                                         chuckRepository: IChuckRepository,
+                                         jokeResponseLiveData: MutableLiveData<JokeRandomResponse>,
+                                         errorRequest: (Throwable) -> Unit,
+                                         errorClick: (Throwable) -> Unit,
+                                         requestJokeByCategory: (
+                                             IChuckRepository,
+                                             String,
+                                             MutableLiveData<JokeRandomResponse>,
+                                             (Throwable) -> Unit,
+                                             JokeViewModel
+                                         ) -> Disposable
+        ->
+        liveData.observe(lifecycleOwner) { category ->
+            Observable.just(category)
+                .subscribe({
+                    viewModel.makeRequest(
+                        it,
+                        chuckRepository,
+                        viewModel,
+                        jokeResponseLiveData,
+                        errorRequest,
+                        requestJokeByCategory
+                    )
+                }, errorClick)
+        }
+    }
 
     @Inject
     lateinit var chuckRepository: IChuckRepository
@@ -44,10 +75,6 @@ class JokeFragment : Fragment() {
 
     @Inject
     lateinit var jokeResponseLiveData: MutableLiveData<JokeRandomResponse>
-
-    private val popBackStack: (NavController) -> Boolean = { navController: NavController ->
-        navController.popBackStack()
-    }
 
     private val requestJokeByCategory: (
         IChuckRepository,
@@ -68,6 +95,19 @@ class JokeFragment : Fragment() {
             )
         }
 
+    val btnCategoryPressed =
+        { btn: Button,
+          navController: NavController,
+          liveData: MutableLiveData<Boolean>,
+          popBackStack: (NavController) -> Boolean,
+          errorClick: (Throwable) -> Unit ->
+
+            btn.clicks()
+                .subscribe({
+                    liveData.value = true
+                    popBackStack(navController)
+                }, errorClick)
+        }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -79,20 +119,20 @@ class JokeFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        (context?.applicationContext as AppController).stringData.observe(viewLifecycleOwner) { category ->
-            Observable.just(category)
-                .subscribe({
-                    selectedCategoriesJokes = it
-                    makeRequest(
-                        selectedCategoriesJokes,
-                        chuckRepository,
-                        viewModel,
-                        jokeResponseLiveData,
-                        errorLog,
-                        requestJokeByCategory
-                    )
-                }, errorLog)
-        }
+
+
+        tv_joke.movementMethod = ScrollingMovementMethod()
+
+        stringDataLiveDataObservable(
+            (context?.applicationContext as AppController).stringData,
+            viewLifecycleOwner,
+            viewModel,
+            chuckRepository,
+            jokeResponseLiveData,
+            errorLog,
+            errorLog,
+            requestJokeByCategory
+        )
 
         jokesByCategoryLiveData(
             jokeResponseLiveData,
@@ -100,95 +140,61 @@ class JokeFragment : Fragment() {
             tv_joke,
             tv_category,
             setText,
-            errorTimber,
-            { tvJoke: TextView,
-              tvCategory: TextView,
-              setText: (TextView, String) -> Unit,
-              error: (Throwable) -> Unit,
-              observable: Observable<JokeRandomResponse> ->
-                observable.observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({
-                        setText(tvJoke, it.value)
-                        setText(tvCategory, it.categories.first())
-                    }) {
-                        error(it)
-                    }
-            }
-        )
-    }
-
-    /**
-     * метод подписываеться на события LiveDate которые были послены с класса выбора категорий шуток [CategoriesJokesAdapter]
-     * @param viewModel вью модель [JokeViewModel]
-     * @param lifecycleOwner жизненный цикл [LifecycleOwner]
-     * @param tvJoke текстовое поле [TextView]
-     * @param setText функция устанвовки текстового поля
-     * @param error функция обработки ошибки
-     * @param push функция обьединяющая все выше перечисленное
-     *
-     */
-    private fun jokesByCategoryLiveData(
-        jokeResponseLiveData: MutableLiveData<JokeRandomResponse>,
-        lifecycleOwner: LifecycleOwner,
-        tvJoke: TextView,
-        tvCategory: TextView,
-        setText: (TextView, String) -> Unit,
-        error: (Throwable) -> Unit,
-        push: (
-            TextView,
-            TextView,
+            errorTimber
+        ) { tvJoke: TextView,
+            tvCategory: TextView,
             setText: (TextView, String) -> Unit,
             error: (Throwable) -> Unit,
-            Observable<JokeRandomResponse>
-        ) -> Disposable
-    ) {
+            observable: Observable<JokeRandomResponse> ->
+            observable.observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    setText(tvJoke, it.value)
+                    setText(tvCategory, it.categories.first())
+                }) {
+                    error(it)
+                }
+        }
+    }
+
+    val jokesByCategoryLiveData = { jokeResponseLiveData: MutableLiveData<JokeRandomResponse>,
+                                    lifecycleOwner: LifecycleOwner,
+                                    tvJoke: TextView,
+                                    tvCategory: TextView,
+                                    setText: (TextView, String) -> Unit,
+                                    error: (Throwable) -> Unit,
+                                    push: (
+                                        TextView,
+                                        TextView,
+                                        setText: (TextView, String) -> Unit,
+                                        error: (Throwable) -> Unit,
+                                        Observable<JokeRandomResponse>
+                                    ) -> Disposable ->
         jokeResponseLiveData.observe(lifecycleOwner) { joke ->
             push(tvJoke, tvCategory, setText, error, Observable.just(joke))
         }
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel.newJokePressed(
+            btn_new_joke,
+            chuckRepository,
+            viewModel,
+            jokeResponseLiveData,
+            ((context?.applicationContext) as AppController).stringData,
+            viewLifecycleOwner,
+            errorLog,
+            requestJokeByCategory,
+            viewModel.makeRequest
+        )
 
-        newJokePressed()
-        btn_category.clicks()
-            .subscribe({
-                ((context?.applicationContext) as AppController).jokeCategoryLiveData.value = true
-                popBackStack(findNavController())
-            }, errorLog)
-    }
-
-
-    private fun newJokePressed() {
-        btn_new_joke.clicks()
-            .subscribe({
-                makeRequest(
-                    selectedCategoriesJokes,
-                    chuckRepository,
-                    viewModel,
-                    jokeResponseLiveData,
-                    errorLog,
-                    requestJokeByCategory
-                )
-            }, errorLog)
-    }
-
-    private fun makeRequest(
-        selectedCategoriesJokes: String,
-        networkService: IChuckRepository,
-        viewModel: JokeViewModel,
-        liveData: MutableLiveData<JokeRandomResponse>,
-        error: (Throwable) -> Unit,
-        request: (
-            IChuckRepository,
-            String,
-            MutableLiveData<JokeRandomResponse>,
-            (Throwable) -> Unit,
-            JokeViewModel
-        ) -> Disposable
-    ): Disposable {
-        return request(networkService, selectedCategoriesJokes, liveData, error, viewModel)
+        btnCategoryPressed(
+            btn_category,
+            findNavController(),
+            ((context?.applicationContext) as AppController).jokeCategoryLiveData,
+            popBackStack,
+            errorLog
+        )
     }
 }
 
