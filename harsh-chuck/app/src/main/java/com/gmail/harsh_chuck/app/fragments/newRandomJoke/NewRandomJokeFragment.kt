@@ -11,7 +11,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
+import androidx.navigation.NavController
+import androidx.navigation.fragment.findNavController
 import com.gmail.harsh_chuck.R
+import com.gmail.harsh_chuck.app.navigator.popBackStack
 import com.gmail.harsh_chuck.data.chuckApi.response.JokeRandomResponse
 import com.gmail.harsh_chuck.domain.repository.IChuckRepository
 import com.gmail.harsh_chuck.helpers.errorTimber
@@ -53,6 +56,16 @@ class NewRandomJokeFragment : Fragment() {
             }, errorClick)
     }
 
+    private val backPressed = { btn: Button,
+                                navController: NavController,
+                                errorClick: (Throwable) -> Unit,
+                                popBackStack: (NavController) -> Boolean ->
+        btn.clicks()
+            .subscribe({
+                popBackStack(navController)
+            }, errorClick)
+    }
+
     private val viewModel: NewRandomJokeViewModel by viewModels()
 
     private val newJokeRequest = { viewModel: NewRandomJokeViewModel,
@@ -85,12 +98,20 @@ class NewRandomJokeFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         newJokeRequest(viewModel, chuckRepository, jokeLiveData, errorTimber)
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         tv_joke.movementMethod = ScrollingMovementMethod()
         jokeLiveDataFunc(tv_joke, jokeLiveData, viewLifecycleOwner, errorTimber, setText)
+
+        backPressed(
+            btn_back,
+            findNavController(),
+            errorTimber,
+            popBackStack
+        )
         newRandomPressed(
             btn_new_joke,
             errorTimber,
